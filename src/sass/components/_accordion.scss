@@ -1,0 +1,47 @@
+// $accordion-padding-x: 2rem;
+$accordion-padding-x: 0.5rem;
+// $accordion-padding-y: 1.5rem;
+$accordion-padding-y: 1.5rem;
+
+$accordion-body-padding-y: 2rem;
+
+$accordion-bg: #F6F8FF;
+$accordion-button-active-bg: transparent;
+$accordion-border-radius: 20px;
+$accordion-border-width:0;
+$accordion-button-focus-border-color: transparent;
+$accordion-button-focus-box-shadow: none;
+$accordion-button-active-color: $dark;
+$accordion-button-icon: url('data:image/svg+xml,<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="20" height="20" rx="10" fill="#{$dark}"/><path d="M4.82738 8.16393C5.02218 7.96523 5.32701 7.94716 5.54181 8.10974L5.60335 8.16393L10 12.6489L14.3966 8.16393C14.5914 7.96523 14.8963 7.94716 15.1111 8.10974L15.1726 8.16393C15.3674 8.36264 15.3851 8.67358 15.2258 8.8927L15.1726 8.95547L10.388 13.8361C10.1932 14.0348 9.88836 14.0528 9.67355 13.8903L9.61201 13.8361L4.82738 8.95547C4.6131 8.73689 4.6131 8.38251 4.82738 8.16393Z" fill="white"/></svg>');
+$accordion-button-active-icon: url('data:image/svg+xml,<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="20" height="20" rx="10" transform="matrix(1 0 0 -1 0 20)" fill="#{$primary}"/><path d="M4.82738 11.8361C5.02218 12.0348 5.32701 12.0528 5.54181 11.8903L5.60335 11.8361L10 7.35106L14.3966 11.8361C14.5914 12.0348 14.8963 12.0528 15.1111 11.8903L15.1726 11.8361C15.3674 11.6374 15.3851 11.3264 15.2258 11.1073L15.1726 11.0445L10.388 6.16393C10.1932 5.96523 9.88836 5.94716 9.67355 6.10974L9.61201 6.16393L4.82738 11.0445C4.6131 11.2631 4.6131 11.6175 4.82738 11.8361Z" fill="white"/></svg>');
+
+
+.accordion{
+    @media (min-width: 767px){
+        --bs-accordion-btn-padding-x: 2rem !important;
+        --bs-accordion-body-padding-x: 2rem !important;
+    }
+}
+
+.accordion-button:before{
+    content: "";
+    width: 0;
+    bottom: 0;
+    background: $border-color;
+    height: 1px;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    -webkit-transform: translateX(-50%);
+    -moz-transform: translateX(-50%);
+    -ms-transform: translateX(-50%);
+    -o-transform: translateX(-50%);
+    transition: all 0.2s ease-in-out;
+    -webkit-transition: all 0.2s ease-in-out;
+    -moz-transition: all 0.2s ease-in-out;
+    -ms-transition: all 0.2s ease-in-out;
+    -o-transition: all 0.2s ease-in-out;
+}
+.accordion-button[aria-expanded="true"]:before{
+    width: calc(100% - 4rem);
+}

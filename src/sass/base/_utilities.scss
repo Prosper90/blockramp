@@ -1,0 +1,45 @@
+.gr-text{ 
+    /* Level up your Blok-Ramps */
+    background: linear-gradient(92.21deg, #336EFF -1.48%, #4D46F5 13.79%, #9633FC 27.4%, #BB29FF 40.37%, #8969C0 59.11%, #39D15A 71.52%, #15FF2D 92.83%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
+}
+
+
+.currency-form{
+    display: flex;
+    align-items: stretch;
+    padding-bottom: 3px;
+    border-bottom: 2px solid $border-color;
+
+    .input-control{
+        padding: 0.5rem 0rem;
+        width: 100%;
+        outline: 0;
+        border: 0px;
+        border-radius: 0;
+        -webkit-border-radius: 0;
+        -moz-border-radius: 0;
+        -ms-border-radius: 0;
+        -o-border-radius: 0;
+        font-size: var(--currency-form-input-fs, $fs-xs);
+        font-weight: 500;
+
+        @media (min-width: 992px){
+            --currency-form-input-fs: #{$fs-lg};
+        }
+
+        &::placeholder{
+            font-size: 15px;
+            color: $gray-700;
+        }
+    }
+    
+    .vr{
+        background-color: $border-color;
+        width: 2px;
+        opacity: 1;
+    }
+}

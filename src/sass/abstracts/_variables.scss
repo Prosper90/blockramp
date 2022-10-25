@@ -1,0 +1,140 @@
+// Button Contrast
+$min-contrast-ratio: 2;
+
+// OTHER COLORS
+$white:    #fff !default;
+$gray-100: #F6F8FF !default;
+$gray-200: #f1f1f1 !default;
+$gray-300: #D8E8FF !default;
+$gray-400: #C7DEFF !default;
+$gray-500: #a3a5ad !default;
+$gray-600: #6c757d !default;
+$gray-700: #4C5F8D !default;
+$gray-800: #343a40 !default;
+$gray-900: #081537 !default;
+$black:    #000 !default;
+
+// COLORS
+$primary: #1554F0;
+$danger: #f93042;
+$success: #13C786;
+$secondary: #a4a5ad;
+$warning: #FB9B04;
+$light: $gray-100;
+$dark:$gray-900;
+
+
+// $primary: #FFC222;
+// $danger: #f93042;
+// $warning: #F5BF4F;
+
+
+// FONT SIZES
+$fs-xxs:   14px;
+$fs-xs:   16px;
+$fs-sm:   18px;
+$fs-md:   20px;
+$fs-lg:   22px;
+$fs-xl:   24px;
+$fs-2xl:  26px;
+$fs-3xl:  30px;
+$fs-4xl:  42px;
+$fs-5xl:  50px;
+$fs-6xl:  58px;
+$fs-7xl:  75px;
+
+// $fs-xs:   8px;
+// $fs-sm:   10px;
+// $fs-md:   12px;
+// $fs-lg:   15px;
+// $fs-xl:   18px;
+// $fs-2xl:  22px;
+// $fs-3xl:  26px;
+// $fs-4xl:  30px;
+// $fs-5xl:  46px;
+// $fs-6xl:  54px;
+
+
+// HEADING FONT SIZE
+$h1-font-size: $fs-5xl;
+$h2-font-size:  $fs-4xl;
+$h3-font-size:  $fs-2xl;
+$h4-font-size:  $fs-xl;
+$h5-font-size:  $fs-lg;
+
+
+// SIZES LIST
+$sizes-list : (
+  "xs": $fs-xs,
+  "sm": $fs-sm,
+  "md": $fs-md,
+  "lg": $fs-lg,
+  "xl": $fs-xl,
+  "2xl": $fs-2xl,
+  "3xl": $fs-3xl,
+  "4xl": $fs-4xl,
+  "5xl": $fs-5xl,
+  "6xl": $fs-6xl,
+  "7xl": $fs-7xl,
+) !default;
+
+
+// CONTAINER
+$container-max-widths: (
+  sm: 540px,
+  md: 720px,
+  lg: 1080px,
+  xl: 1170px,
+  xxl: 1320px,
+);
+
+// DISPLAY FONT SIZES
+$display-font-sizes: (
+  1: 7rem,
+  2: 4.5rem,
+  3: 4rem,
+  4: 3.5rem,
+  5: 3rem,
+  6: 2.5rem
+);
+
+
+// Spacers List
+$spacer: 1rem;
+$spacers: (
+  0: 0,
+  1: $spacer * .25,
+  2: $spacer * .5,
+  3: $spacer,
+  4: $spacer * 1.5,
+  5: $spacer * 2.5,
+  6: $spacer * 4,
+  7: $spacer * 5,
+  8: $spacer * 6,
+  9: $spacer * 7,
+  10: $spacer * 8,
+  11: $spacer * 9,
+  12: $spacer * 10,
+) !default;
+
+
+// Border
+// $border-radius: 0rem;
+// $border-radius-lg: 1.5rem;
+// $border-radius: 0.25rem;
+// $border-radius-lg: 1.5rem;
+
+$border-color: rgba($gray-400, 0.5);
+
+
+
+$enable-shadows: true;
+
+// Font Family
+$ff-primary:  'Inter', sans-serif;
+$ff-secondary:  'Lora', serif;
+$ff-tertiary:  'Public Sans', sans-serif;
+
+// Box Shadow
+// $box-shadow: 0 0 8px -2px rgba(0, 0, 0, 0.1);
+$box-shadow: 0px 14px 54px rgba(0,0,0,0.03);

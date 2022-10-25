@@ -1,0 +1,30 @@
+$input-padding-y: 1.17rem;
+$input-padding-x: 2rem;
+$input-font-size: $fs-sm;
+$input-font-weight: 400;
+$input-line-height: 1;
+$input-bg: $white;
+$input-border-color: #C7DEFF;
+$input-placeholder-color: $gray-700;
+$input-border-radius: 50px;
+// $input-box-shadow: none;
+
+// Form Label
+$form-label-font-weight: 600;
+$form-label-font-size: $fs-md;
+
+
+.form-control::placeholder{
+    font-size: 15px;
+}
+
+.select-no-style{
+    outline: 0;   
+    padding-right: 25px;
+    appearance: none;
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQiIGhlaWdodD0iOCIgdmlld0JveD0iMCAwIDE0IDgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0wLjIwMDg4NyAwLjIwNDkxNkMwLjQ0NDM4NiAtMC4wNDM0NjcgMC44MjU0MjMgLTAuMDY2MDQ3MyAxLjA5MzkzIDAuMTM3MTc1TDEuMTcwODYgMC4yMDQ5MTZMNi42NjY2NyA1LjgxMTE4TDEyLjE2MjUgMC4yMDQ5MTZDMTIuNDA2IC0wLjA0MzQ2NyAxMi43ODcgLTAuMDY2MDQ3MyAxMy4wNTU1IDAuMTM3MTc1TDEzLjEzMjQgMC4yMDQ5MTZDMTMuMzc1OSAwLjQ1MzI5OSAxMy4zOTgxIDAuODQxOTc4IDEzLjE5ODkgMS4xMTU4N0wxMy4xMzI0IDEuMTk0MzRMNy4xNTE2NSA3LjI5NTA4QzYuOTA4MTUgNy41NDM0NyA2LjUyNzExIDcuNTY2MDUgNi4yNTg2MSA3LjM2MjgyTDYuMTgxNjggNy4yOTUwOEwwLjIwMDg4NyAxLjE5NDM0Qy0wLjA2Njk2MjMgMC45MjExMTYgLTAuMDY2OTYyMyAwLjQ3ODEzNyAwLjIwMDg4NyAwLjIwNDkxNloiIGZpbGw9IiMwODE1MzciLz4KPC9zdmc+Cg==");
+    background-size: 15px;
+    background-repeat: no-repeat;
+    background-position: 100% 15px;
+    height: 40px;
+}

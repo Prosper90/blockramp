@@ -1,0 +1,25 @@
+.footer{
+    background-color: #F6F8FF;
+    position: relative;
+    z-index: 1;
+
+
+
+    .shape-1{
+        position: absolute;
+        left: 0;
+        top: 0;
+        max-width: 40vw;
+        height: 100%;
+        z-index: -1;
+    }
+
+    .shape-2{
+        position: absolute;
+        right: 0;
+        top: 0;
+        max-width: 30vw;
+        height: 100%;
+        z-index: -1;
+    }
+}

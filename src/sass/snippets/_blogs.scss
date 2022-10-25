@@ -1,0 +1,6 @@
+.section-gap{
+    @media (min-width: 992px){
+        padding-top: var(--section-padding-top, 120px) !important;
+        padding-bottom: var(--section-padding-bottom, 120px) !important;
+    }
+}

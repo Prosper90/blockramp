@@ -1,0 +1,33 @@
+$list-group-border-color: $border-color;
+
+.list-check{
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+
+    li{
+        position: relative;
+        display: flex;
+        gap: 20px;
+        font-size: $fs-sm;
+
+        &::before{
+            content: "";
+            position: relative;
+            display: inline-block;
+            margin-top: 7px;
+            min-width: 20px;
+            width: 20px;
+            height: 20px;
+            background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0xMCAwQzQuNDc3MjcgMCAwIDQuNDc3MjcgMCAxMEMwIDE1LjUyMjcgNC40NzcyNyAyMCAxMCAyMEMxNS41MjI3IDIwIDIwIDE1LjUyMjcgMjAgMTBDMjAgNC40NzcyNyAxNS41MjI3IDAgMTAgMFpNMTQuMzM0NSA4LjMwOTA5QzE0LjQxNDQgOC4yMTc4NiAxNC40NzUxIDguMTExNTggMTQuNTEzMyA3Ljk5NjUyQzE0LjU1MTQgNy44ODE0NSAxNC41NjYxIDcuNzU5OTIgMTQuNTU2NiA3LjYzOTA4QzE0LjU0NzEgNy41MTgyMyAxNC41MTM1IDcuNDAwNTEgMTQuNDU3OCA3LjI5Mjg0QzE0LjQwMjEgNy4xODUxNyAxNC4zMjU0IDcuMDg5NzMgMTQuMjMyMyA3LjAxMjEzQzE0LjEzOTIgNi45MzQ1MyAxNC4wMzE1IDYuODc2MzMgMTMuOTE1NSA2Ljg0MDk3QzEzLjc5OTYgNi44MDU2IDEzLjY3NzcgNi43OTM3OCAxMy41NTcyIDYuODA2MjFDMTMuNDM2NiA2LjgxODYzIDEzLjMxOTcgNi44NTUwNCAxMy4yMTM0IDYuOTEzM0MxMy4xMDcxIDYuOTcxNTYgMTMuMDEzNSA3LjA1MDUgMTIuOTM4MiA3LjE0NTQ1TDkuMDI5MDkgMTEuODM1NUw3LjAwNjM2IDkuODExODJDNi44MzQ5MSA5LjY0NjIyIDYuNjA1MjcgOS41NTQ1OSA2LjM2NjkxIDkuNTU2NjZDNi4xMjg1NSA5LjU1ODczIDUuOTAwNTQgOS42NTQzNCA1LjczMTk4IDkuODIyODlDNS41NjM0MyA5Ljk5MTQ1IDUuNDY3ODIgMTAuMjE5NSA1LjQ2NTc1IDEwLjQ1NzhDNS40NjM2OCAxMC42OTYyIDUuNTU1MzEgMTAuOTI1OCA1LjcyMDkxIDExLjA5NzNMOC40NDgxOCAxMy44MjQ1QzguNTM3NTEgMTMuOTEzOCA4LjY0NDQ1IDEzLjk4MzUgOC43NjIyIDE0LjAyOTFDOC44Nzk5NCAxNC4wNzQ4IDkuMDA1OTEgMTQuMDk1NCA5LjEzMjA2IDE0LjA4OTdDOS4yNTgyMiAxNC4wODQgOS4zODE4IDE0LjA1MiA5LjQ5NDkyIDEzLjk5NTlDOS42MDgwNCAxMy45Mzk3IDkuNzA4MjMgMTMuODYwNiA5Ljc4OTA5IDEzLjc2MzZMMTQuMzM0NSA4LjMwOTA5WiIgZmlsbD0iIzE1NTRGMCIvPgo8L3N2Zz4K");
+            background-position: center;
+            background-size: 100%;
+            box-shadow: 0px 3px 6px rgba(4, 99, 238, 0.28);
+            border-radius: 30px;
+            -webkit-border-radius: 30px;
+            -moz-border-radius: 30px;
+            -ms-border-radius: 30px;
+            -o-border-radius: 30px;
+}
+    }
+}

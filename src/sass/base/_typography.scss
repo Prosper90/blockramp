@@ -1,0 +1,37 @@
+// FONT FAMILY
+@each $key, $value in ('primary': $ff-primary, 'secondary': $ff-secondary) {
+  .ff-#{$key} {
+    font-family: $value !important;
+  }
+}
+// LINE HEIGHT
+@each $key, $value in ('xs': 1, 'sm': 1.2, 'md':1.4, 'lg':1.8, 'xl':2, '2xl': 2.3, '3xl': 2.5) {
+  .lh-#{$key} {
+    line-height: $value !important;
+  }
+}
+
+// LETTER SPACING
+@each $key, $value in ( 'xxs': -0.07rem, 'xs': 1.5px, 'sm': 0.03em, 'md':0.07em, 'lg':0.1em, 'xl':0.13em, '2xl': 0.16em, '3xl': 0.2em) {
+  .ls-#{$key} {
+    letter-spacing: $value !important;
+  }
+}
+
+@mixin make-custom-styles($columns: $grid-columns, $gutter: $grid-gutter-width, $breakpoints: $grid-breakpoints) {
+  @each $breakpoint in map-keys($breakpoints) {
+    $infix: breakpoint-infix($breakpoint, $breakpoints);
+
+    @include media-breakpoint-up($breakpoint, $breakpoints) {
+
+      // Font Sizes
+      @each $key, $value in $sizes-list {
+        .fs#{$infix}-#{$key} {
+          font-size: var(--#{$variable-prefix}font-size, #{$value}) !important;
+        }
+      }
+    }
+  }
+}
+
+@include make-custom-styles();

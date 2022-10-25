@@ -1,0 +1,7 @@
+:root{
+    --bs-body-font-size: #{$fs-lg};
+
+    @media (max-width: 991px){
+        --bs-body-font-size: #{$fs-xs};
+    }
+}

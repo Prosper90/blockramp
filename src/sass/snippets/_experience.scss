@@ -1,0 +1,9 @@
+.experience-row{
+    @media (min-width: 1199px){
+        --bs-gutter-x: 100px;
+        
+        .card-body{
+            padding-right: 2.7rem !important;
+        }
+    }
+}
