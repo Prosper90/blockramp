@@ -1,4 +1,4 @@
-import React, { useState}  from 'react'
+import React, { useState, useEffect }  from 'react'
 import { Col, Container, Row } from 'react-bootstrap';
 import appStore from './assets/app-store.svg';
 import playStore from './assets/play-store.svg';
@@ -17,6 +17,8 @@ import shape4 from './assets/hero-user.svg';
 import currencyETH from './assets/ethereum.svg';
 import currencyBNB from './assets/binance.svg';
 import currencyUSDT from './assets/tether.svg';
+import {ethers} from 'ethers';
+
 
 
 const options = [
@@ -95,6 +97,67 @@ const Hero = () => {
             { thumb: playStore,}
         ]
     }
+
+    //variables
+    const [provider, setProvider] = useState(undefined);
+    const [signer, setSigner] = useState(undefined);
+    const [signerAddress, setSignerAddress] = useState(undefined);
+
+
+
+
+    //connect wallet check is connected
+    const isConnected = () => signer !== undefined;
+
+    //getWallet address
+    const getWalletAddress = () => {
+        signer.getAddress().
+        then(address => {
+          setSignerAddress(address)
+
+          //todo: connect weth and uni contracts
+        })
+    }
+
+
+    if (signer !== undefined) {
+     getWalletAddress();
+   }
+
+
+
+    //getSigner
+    const getSigner = async ( provider ) => {
+        console.log("Second guy");
+      provider?.send("eth_requestAccounts", []);
+      const signer =  provider.getSigner();
+      setSigner(signer);
+      return;
+    }
+
+   
+
+
+    //display address
+    const displayaddr = () => {
+        return `${signerAddress?.substring(0,10)}`;
+    }
+
+
+
+    //useEffect
+   useEffect(() => {
+    console.log("Entered");
+     const onLoad = async () => {
+        const provider = await new ethers.providers.Web3Provider(window.ethereum);
+        setProvider(provider);
+        console.log("ran through");
+    }
+
+    onLoad();
+   }, [])
+
+
 
     const form = () => (
         <div className="heroform card-body p-4 p-lg-5">
@@ -223,6 +286,7 @@ const Hero = () => {
                 <div>
                     <h6 className='mb-1 heroform__field-title fs-md-sm fw-regular'>1 BTC is ≈</h6>
                     <div className='fs-xs fs-md-sm'><span className="text-dark fw-bold">53,260.20</span> USD</div>
+                    {signerAddress && <> {displayaddr()}... </>}
                 </div>
             </div>
             
@@ -296,11 +360,37 @@ const Hero = () => {
              </div>
 
             </div>
+            
+            {isConnected() ? (
 
-            <div className="form-group">
-                <button className="btn btn-primary w-100 rounded-pill shadow">Swap</button>
-            </div>
+                <div className="form-group">
+                    <button className="btn btn-primary w-100 rounded-pill shadow">Swap</button>
+                </div>
+
+            ): 
+               ( 
+                <div className="form-group">
+                    <button className="btn btn-primary w-100 rounded-pill shadow"
+                    type="button"
+                    onClick={ (e) => {
+                         e.preventDefault()
+                         getSigner(provider)
+                         }
+                        }
+                    >
+                        Connect Wallet
+                    </button>
+                </div>
+
+               )
+
+             
+             }
+
+
         </form>
+
+
         <div className='text-center'>
             <h6 className="text-dark fs-sm fw-light">We accept</h6>
 
