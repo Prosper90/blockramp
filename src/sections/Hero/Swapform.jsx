@@ -22,73 +22,13 @@ import { BsGearFill } from 'react-icons/bs';
 import Configmodal from './Configmodal';
 import Tokensmodal from './Tokensmodal';
 import tokenabi from './abi.json';
-import * as qs from 'qs'
+import qs from 'qs';
 import { ChainId, Fetcher, Percent, Token, TokenAmount, Pair, TradeType, Route, CurrencyAmount, WETH } from '@uniswap/sdk'
 
 
 
 
 
-
-const crypto_options = [
-    { 
-        value: 'Dai', 
-        label: 'Dai', 
-        icon:  currencyETH,
-        name:  'Dai',
-        symbol: 'Dai',
-        decimals: 18,
-        address: "0x6B175474E89094C44Da98b954EedeAC495271d0F" 
-    },
-    { 
-        value: 'USDC', 
-        label: 'USDC', 
-        icon:  currencyETH,
-        name:  'USDC',
-        symbol: 'USD//C',
-        decimals: 6,
-        address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" 
-    },
-    { value: 'eth', label: 'ETH', icon:  currencyETH },
-    { value: 'bnb', label: 'BNB', icon:  currencyBNB },
-    { value: 'usdt', label: 'USDT', icon:  currencyUSDT },
-];
-
-
-
-
-const IconOption = props => (
-    <components.Option {...props}>
-        <span className="me-2"><img src={props.data.icon} alt={props.data.label}/></span>
-        <span>{props.data.label}</span>
-    </components.Option>
-);
-
-const ValueContainer = ({children, ...props}) => {
-    if (!props.hasValue) {
-      return <components.ValueContainer {...props}>{children}</components.ValueContainer>;
-    }
-  
-    const value = props.getValue()[0];
-    console.log("CAHNGE", value);
-
-    return (
-      <components.ValueContainer {...props}>
-        <div className="d-flex gap-2">
-            <span><img src={value.icon} alt={value.label}/></span>
-            <span>{value.label}</span>
-        </div>
-      </components.ValueContainer>
-    );
-  };
-
-const DropdownIndicator = props => {
-    return (
-      <components.DropdownIndicator {...props}>
-        <img src={arrow} />
-      </components.DropdownIndicator>
-    );
-};
 
 
 
@@ -142,7 +82,15 @@ export default function Swapform() {
 
         
 
-
+      //Ether
+      const eth = {
+        address : "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+        chainId : 1,
+        decimals: 18,
+        logoURI: currencyETH,
+        name: "ethereum",
+        symbol: "eth"
+      }
 
 
 
@@ -318,25 +266,38 @@ export default function Swapform() {
         //console.log(amount);
       
         const params = {
+            sellToken: selectedone.address,
             buyToken: selectedtwo.address,
             sellAmount: amount,
-            sellToken: selectedone.address,
-            takerAddress: signerAddress
         }
+
+        const getquote = qs.stringify(params);
+        console.log(getquote);
       
         // Fetch the swap price.
-        const response = await fetch(`https://api.0x.org/swap/v1/quote?${qs.stringify(params)}`);
+        const response = await fetch(`https://api.0x.org/swap/v1/price?${qs.stringify(params)}`);
+        /* const response = await fetch(`https://api.0x.org/swap/v1/quote?buyToken=${selectedtwo.address}&sellToken=${selectedone.address}&sellAmount=${amount}&excludedSources=Uniswap,0x`,
+         {
+          method: 'GET',   
+          headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+          }
+        });
+        */
+        //const response = await fetch(`https://api.0x.org/swap/v1/quote?buyToken=DAI&sellToken=ETH&sellAmount=1000000000000000000&excludedSources=0x,Kyber`);
+
         setLoader(true);
         setLoadermsg('fetching quote data');
         console.log(respose);
         
-        swapQuoteJSON = await response.json();
-        console.log("Quote: ", swapQuoteJSON);
+        swapPriceJSON = await response.json();
+        console.log("Price: ", swapPriceJSON);
         
         //document.getElementById("to_amount").value = swapPriceJSON.buyAmount / (10 ** currentTrade.to.decimals);
         //document.getElementById("gas_estimate").innerHTML = swapPriceJSON.estimatedGas;
 
-       setOutputAmount(swapQuoteJSON.buyAmount / (10 ** currentTrade.to.decimals));
+       setOutputAmount(swapPriceJSON.buyAmount / (10 ** currentTrade.to.decimals));
        setLoadermsg('');
        setLoader(false);
        
@@ -369,7 +330,7 @@ export default function Swapform() {
         console.log("listing available tokens: ");
         console.log(tokenListJSON.tokens);
         const tokenstoUse = tokenListJSON.tokens.slice(0, 1000);
-        setSelectedone(tokenstoUse[0]);
+        setSelectedone(eth);
         setTokenlist(tokenstoUse);
       }
 
@@ -445,7 +406,7 @@ export default function Swapform() {
 
   return (
         <div className="heroform card-body p-4 p-lg-5 formswap" >
-          <form className='mb-5'   >
+          <form className='mb-5' onSubmit={submit} >
               <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
                   <div className='d-flex align-items-center gap-3' style={{fontSize: '20px'}}>
                        How much do you want to swap ?
