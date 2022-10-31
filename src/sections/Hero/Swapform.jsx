@@ -133,6 +133,11 @@ export default function Swapform() {
         const [inBalalnce, setinBalance] = useState(0);
         const [outBalance, setoutBalance] = useState(0);
 
+        //loaders
+        const [loader, setLoader] = useState(false);
+        const [loadermsg, setLoadermsg] = useState();
+        const [toggle, setToggle] = useState(false);
+
 
 
         
@@ -268,9 +273,36 @@ export default function Swapform() {
       //handle change
       const handleChangerecieved = async (e) => {
 
-        if(!selectedone) return;
-        if(!selectedtwo) return;
-        if(!signerAddress) return;
+        if(!selectedone) {
+
+          setLoader(true);
+          setLoadermsg('Token to sell not selected');
+
+          setTimeout(() => {
+
+            setLoadermsg('');
+            setLoader(false);
+            
+          }, 2000);
+
+          return ;
+          
+        };
+
+        if(!selectedtwo) {
+          setLoader(true);
+          setLoadermsg('Token to buy not selected');
+
+          setTimeout(() => {
+
+            setLoadermsg('');
+            setLoader(false);
+            
+          }, 2000);
+
+          return ;
+        };
+
 
         console.log("in handle");
 
@@ -286,14 +318,16 @@ export default function Swapform() {
         //console.log(amount);
       
         const params = {
-            sellToken: selectedone.address,
             buyToken: selectedtwo.address,
             sellAmount: amount,
+            sellToken: selectedone.address,
             takerAddress: signerAddress
         }
       
         // Fetch the swap price.
         const response = await fetch(`https://api.0x.org/swap/v1/quote?${qs.stringify(params)}`);
+        setLoader(true);
+        setLoadermsg('fetching quote data');
         console.log(respose);
         
         swapQuoteJSON = await response.json();
@@ -303,6 +337,9 @@ export default function Swapform() {
         //document.getElementById("gas_estimate").innerHTML = swapPriceJSON.estimatedGas;
 
        setOutputAmount(swapQuoteJSON.buyAmount / (10 ** currentTrade.to.decimals));
+       setLoadermsg('');
+       setLoader(false);
+       
       }
 
 
@@ -331,9 +368,9 @@ export default function Swapform() {
         let tokenListJSON = await response.json();
         console.log("listing available tokens: ");
         console.log(tokenListJSON.tokens);
-        const tokenstoUse = tokenListJSON.tokens.slice(0, 100);
+        const tokenstoUse = tokenListJSON.tokens.slice(0, 1000);
+        setSelectedone(tokenstoUse[0]);
         setTokenlist(tokenstoUse);
-        
       }
 
 
@@ -392,25 +429,31 @@ export default function Swapform() {
         console.log(showModal);
 
         getTokenslist();
+
+
+        if(loader) {
+           setToggle(!toggle);
+        } else {
+          setToggle(false);
+        }
     
     
-       }, [showModal])
+       }, [showModal, toggle])
 
 
 
 
   return (
         <div className="heroform card-body p-4 p-lg-5 formswap" >
-          <form className='mb-5' onSubmit={submit}  >
+          <form className='mb-5'   >
               <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
-                  <div className='d-flex align-items-center gap-3'>
-                       How much do you want to swap?
+                  <div className='d-flex align-items-center gap-3' style={{fontSize: '20px'}}>
+                       How much do you want to swap ?
                   </div>
                   <div className='d-flex w-100 justify-content-between pr-3'>
                       <div className='d-flex w-100'>
                           <h6 className='mb-1 heroform__field-title fs-md-sm fw-regular'>1 BTC is ≈</h6>
                           <div className='fs-xs fs-md-sm ml-3'><span className="text-dark fw-bold">53,260.20</span> USD</div>
-                          
                       </div>
   
                       <div className='text-end' onClick={() => setShowModal(true) }>
@@ -427,6 +470,9 @@ export default function Swapform() {
                        )
                       }
   
+                  </div>
+                  <div className={toggle && 'text-success'} style={{fontSize: '13px'}}>
+                    {loader && loadermsg}
                   </div>
   
               </div>
@@ -491,6 +537,7 @@ export default function Swapform() {
                       setSelectedtwo={setSelectedtwo}
                       off={setOpenlistmodal}
                       getBalance={getBalance}
+                      onClose={() => setOpenlistmodal(false)}
                     />
                   }
               
@@ -499,7 +546,14 @@ export default function Swapform() {
                 <>
   
                   <div className="form-group">
-                      <button className="btn btn-primary w-100 rounded-pill shadow">Swap</button>
+                    <>
+                      {inBalalnce == 0 ?
+                        <div className="btn btn-primary w-100 rounded-pill shadow text-warning" type='button'> Insufficient {selectedone.symbol} amount </div>
+                       :
+                        <button className="btn btn-primary w-100 rounded-pill shadow" type='button'>Swap</button>
+                      }
+                      
+                    </>
                   </div>
 
                   <small style={{fontSize: '12px'}}>{signerAddress && <> {displayaddr()}... </>}</small>
@@ -509,7 +563,7 @@ export default function Swapform() {
               ): 
                  ( 
                   <div className="form-group">
-                      <button className="btn btn-primary w-100 rounded-pill shadow"
+                      <div className="btn btn-primary w-100 rounded-pill shadow"
                       type="button"
                       onClick={ (e) => {
                            e.preventDefault()
@@ -518,7 +572,7 @@ export default function Swapform() {
                           }
                       >
                           Connect Wallet
-                      </button>
+                      </div>
                   </div>
   
                  )
