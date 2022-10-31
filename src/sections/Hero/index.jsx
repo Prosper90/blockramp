@@ -14,10 +14,8 @@ import shape1 from './assets/hero-shape-1.svg';
 import shape2 from './assets/hero-shape-2.svg';
 import shape3 from './assets/arrow-shape.svg';
 import shape4 from './assets/hero-user.svg';
-import currencyETH from './assets/ethereum.svg';
-import currencyBNB from './assets/binance.svg';
-import currencyUSDT from './assets/tether.svg';
-import {ethers} from 'ethers';
+
+import Swapform from './Swapform';
 
 
 
@@ -28,11 +26,6 @@ const options = [
 ]; 
 
 
-const crypto_options = [
-    { value: 'eth', label: 'ETH', icon:  currencyETH},
-    { value: 'bnb', label: 'BNB', icon:  currencyBNB },
-    { value: 'usdt', label: 'USDT', icon:  currencyUSDT },
-];
 
 
 const rate_options = [
@@ -98,64 +91,7 @@ const Hero = () => {
         ]
     }
 
-    //variables
-    const [provider, setProvider] = useState(undefined);
-    const [signer, setSigner] = useState(undefined);
-    const [signerAddress, setSignerAddress] = useState(undefined);
 
-
-
-
-    //connect wallet check is connected
-    const isConnected = () => signer !== undefined;
-
-    //getWallet address
-    const getWalletAddress = () => {
-        signer.getAddress().
-        then(address => {
-          setSignerAddress(address)
-
-          //todo: connect weth and uni contracts
-        })
-    }
-
-
-    if (signer !== undefined) {
-     getWalletAddress();
-   }
-
-
-
-    //getSigner
-    const getSigner = async ( provider ) => {
-        console.log("Second guy");
-      provider?.send("eth_requestAccounts", []);
-      const signer =  provider.getSigner();
-      setSigner(signer);
-      return;
-    }
-
-   
-
-
-    //display address
-    const displayaddr = () => {
-        return `${signerAddress?.substring(0,10)}`;
-    }
-
-
-
-    //useEffect
-   useEffect(() => {
-    console.log("Entered");
-     const onLoad = async () => {
-        const provider = await new ethers.providers.Web3Provider(window.ethereum);
-        setProvider(provider);
-        console.log("ran through");
-    }
-
-    onLoad();
-   }, [])
 
 
 
@@ -276,130 +212,7 @@ const Hero = () => {
         
     )
 
-    const swapform = () => (
-        <div className="heroform card-body p-4 p-lg-5">
-        <form className='mb-5'>
-            <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
-                <div className='d-flex align-items-center gap-3'>
-                     How much do you want to swap?
-                </div>
-                <div>
-                    <h6 className='mb-1 heroform__field-title fs-md-sm fw-regular'>1 BTC is ≈</h6>
-                    <div className='fs-xs fs-md-sm'><span className="text-dark fw-bold">53,260.20</span> USD</div>
-                    {signerAddress && <> {displayaddr()}... </>}
-                </div>
-            </div>
-            
-            <div className="form-group currency-form mb-4">
-                <input type="text" class="input-control" placeholder="0.0" aria-label="Input"  />
-                <span className="vr mx-3 my-1"></span>
-                <div className='flex flex-column m*-0 px-0 no-gutter' >
-                <Select
-                    styles={{
-                        control: (provided, state) => ({
-                            ...provided,
-                            border: 0,
-                            outline: 0,
-                            boxShadow: 'none',
-                            padding: 0,
-                            fontSize: 'var(--heroform__field-big-fs, 18px)',
-                            fontWeight: 400,
-                            color: '#081537',
-                            width: 100,
-                            }),
-                        valueContainer: (provided, state) => ({
-                            ...provided,
-                            padding: 0,
-                        }),
-                        option: (provided, state) => ({
-                            ...provided,
-                            fontSize: '15px',
-                        }),
-                    }}
-                    defaultValue={crypto_options[0]}
-                    options={crypto_options}
-                    components={{ Option: IconOption, IndicatorSeparator:() => null, DropdownIndicator, ValueContainer}}
-                />
-                <div className='balanceshow' >Balance : 0.00</div>
-                </div>
-            </div>
-            
-            <div className="form-group currency-form mb-4">
-                <input type="text" class="input-control" placeholder="0.0" aria-label="Input"  />
-                <span className="vr mx-3 my-1"></span>
 
-                <div className='flex flex-column m*-0 px-0 no-gutter' >
-                <Select
-                    styles={{
-                        control: (provided, state) => ({
-                            ...provided,
-                            border: 0,
-                            outline: 0,
-                            boxShadow: 'none',
-                            padding: 0,
-                            fontSize: 'var(--heroform__field-big-fs, 18px)',
-                            fontWeight: 400,
-                            color: '#081537',
-                            width: 100,
-                            }),
-                        valueContainer: (provided, state) => ({
-                            ...provided,
-                            padding: 0,
-                        }),
-                        option: (provided, state) => ({
-                            ...provided,
-                            fontSize: '15px',
-                        }),
-                    }}
-                    defaultValue={crypto_options[0]}
-                    options={crypto_options}
-                    components={{ Option: IconOption, IndicatorSeparator:() => null, DropdownIndicator, ValueContainer}}
-                />
-               <div className='balanceshow' >Balance : 0.00</div>
-
-             </div>
-
-            </div>
-            
-            {isConnected() ? (
-
-                <div className="form-group">
-                    <button className="btn btn-primary w-100 rounded-pill shadow">Swap</button>
-                </div>
-
-            ): 
-               ( 
-                <div className="form-group">
-                    <button className="btn btn-primary w-100 rounded-pill shadow"
-                    type="button"
-                    onClick={ (e) => {
-                         e.preventDefault()
-                         getSigner(provider)
-                         }
-                        }
-                    >
-                        Connect Wallet
-                    </button>
-                </div>
-
-               )
-
-             
-             }
-
-
-        </form>
-
-
-        <div className='text-center'>
-            <h6 className="text-dark fs-sm fw-light">We accept</h6>
-
-            <img src={AccpetPayments} alt="" className='img-fluid'/>
-
-
-        </div>
-    </div>
-    )
     
   return (
     <section className='hero-area'>
@@ -572,7 +385,7 @@ const Hero = () => {
                                     {form()}
                                 </Tab>
                                 <Tab eventKey="swap" title="SWAP">
-                                    {swapform()}
+                                    { <Swapform /> }
                                 </Tab>
                             </Tabs>
                         </div>
