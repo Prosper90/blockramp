@@ -57,7 +57,7 @@ export default function Swapform() {
 
         //prefill input
         const [inputAmount, setInputAmount] = useState(undefined);
-        const [outputAmount, setOutputAmount] = useState(undefined);
+        const [outputAmount, setOutputAmount] = useState('0.0');
 
         //check selected
         const [checkselect, setCheckselect] = useState(undefined);
@@ -77,6 +77,9 @@ export default function Swapform() {
         const [loader, setLoader] = useState(false);
         const [loadermsg, setLoadermsg] = useState();
         const [toggle, setToggle] = useState(false);
+
+        //hold quote
+        const [holdquote, setHoldquote] =useState();
 
 
 
@@ -100,40 +103,79 @@ export default function Swapform() {
 
         const submit = async (e) => {
 
-              if(!signerAddress) return;
-              if(!signer) return;
-              if(!selectedone) return;
-              if(!selectedtwo) return;
+              if(!signerAddress) {
+                setLoader(true);
+                setLoadermsg('Connect Wallet');
+      
+                setTimeout(() => {
+      
+                  setLoadermsg('');
+                  setLoader(false);
+                  
+                }, 2000);
+      
+                return ;
+              };
+              if(!signer) {
+
+                setLoader(true);
+                setLoadermsg('Connect Wallet');
+      
+                setTimeout(() => {
+      
+                  setLoadermsg('');
+                  setLoader(false);
+                  
+                }, 2000);
+      
+                return ;
+                
+              };
+
+              if(!selectedone) {
+                setLoadermsg('Token to sell not selected');
+
+                setTimeout(() => {
+      
+                  setLoadermsg('');
+                  setLoader(false);
+                  
+                }, 2000);
+              };
+              if(!selectedtwo) {
+                setLoadermsg('Token to buy not selected');
+
+                setTimeout(() => {
+      
+                  setLoadermsg('');
+                  setLoader(false);
+                  
+                }, 2000);
+              };
 
               console.log("trying swap");
               // Only work if MetaMask is connect
               // Connecting to Ethereum: Metamask
-              const web3 = await new ethers.providers.Web3Provider(window.ethereum);
+              const providerethers = await new ethers.providers.Web3Provider(window.ethereum);
             
               // The address, if any, of the most recently used account that the caller is permitted to access
-              let accounts = await ethereum.request({ method: "eth_accounts" });
-              let takerAddress = accounts[0];
+              //let accounts = await ethereum.request({ method: "eth_accounts" });
+              let takerAddress = signerAddress;
               console.log("takerAddress: ", takerAddress);
             
-              const swapQuoteJSON = await getQuote(takerAddress);
+              const swapQuoteJSON = holdquote;
             
               // Set Token Allowance
               // Set up approval amount
-              const fromTokenAddress = selectedone.address;
+              const fromTokenAddress = selectedone.contract_address ? selectedone.contract_address : '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
               const maxApproval = new BigNumber(2).pow(256).minus(1);
               console.log("approval amount: ", maxApproval);
-              const ERC20TokenContract = new ethers.Contract(fromTokenAddress, tokenabi, web3);
+              const ERC20TokenContract = new ethers.Contract(fromTokenAddress, tokenabi, providerethers);
               console.log("setup ERC20TokenContract: ", ERC20TokenContract);
             
               // Grant the allowance target an allowance to spend our tokens.
-              const tx = await ERC20TokenContract.approve(
-                  swapQuoteJSON.allowanceTarget,
-                  maxApproval,
-              )
-              .send({ from: signerAddress })
-              .then(tx => {
-                  console.log("tx: ", tx)
-              });
+              const tx = await ERC20TokenContract.approve( swapQuoteJSON.allowanceTarget, maxApproval);
+
 
               // Perform the swap
               const receipt = await signer.sendTransaction(swapQuoteJSON);
@@ -251,23 +293,35 @@ export default function Swapform() {
           return ;
         };
 
+        let decimalfrom = 18;
+        let decimalto = 18;
 
-        console.log("in handle");
+       if(selectedone.contract_address) {
+        console.log("Entered one contract");
+          const fromContract = new ethers.Contract(selectedone.contract_address, tokenabi, provider);
+          decimalfrom = await fromContract.decimals();
+          console.log(decimalfrom);
+       }
+
+       if(selectedtwo.contract_address) {
+        console.log("Entered two contract");
+        const toContract = new ethers.Contract(selectedtwo.contract_address, tokenabi, provider);
+        decimalto = await toContract.decimals();
+        console.log(decimalto);
+       }
+
 
         const amountinput = e.target.value;
 
-        console.log(amountinput);
-        console.log(selectedone);
-        console.log(selectedone);
-        console.log("Getting Quote");
   
         if (!amountinput) return;
-        let amount = Number(amountinput * 10 ** selectedone.decimals);
-        //console.log(amount);
+        const amount = Number(parseInt(e.target.value) * 10 ** decimalfrom);
+        //const amount = ethers.utils.parseEther(e.target.value);
+        console.log(parseInt(e.target.value), amount);
       
         const params = {
-            sellToken: selectedone.address,
-            buyToken: selectedtwo.address,
+            buyToken: selectedtwo.contract_address ? selectedtwo.contract_address : selectedtwo.symbol,
+            sellToken: selectedone.contract_address ? selectedone.contract_address : selectedone.symbol,
             sellAmount: amount,
         }
 
@@ -275,29 +329,25 @@ export default function Swapform() {
         console.log(getquote);
       
         // Fetch the swap price.
-        const response = await fetch(`https://api.0x.org/swap/v1/price?${qs.stringify(params)}`);
-        /* const response = await fetch(`https://api.0x.org/swap/v1/quote?buyToken=${selectedtwo.address}&sellToken=${selectedone.address}&sellAmount=${amount}&excludedSources=Uniswap,0x`,
-         {
-          method: 'GET',   
-          headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-          }
-        });
-        */
-        //const response = await fetch(`https://api.0x.org/swap/v1/quote?buyToken=DAI&sellToken=ETH&sellAmount=1000000000000000000&excludedSources=0x,Kyber`);
+        const response = await fetch(`https://api.0x.org/swap/v1/quote?${qs.stringify(params)}`);
+
 
         setLoader(true);
         setLoadermsg('fetching quote data');
-        console.log(respose);
+        //console.log( await response.json());
         
-        swapPriceJSON = await response.json();
-        console.log("Price: ", swapPriceJSON);
-        
-        //document.getElementById("to_amount").value = swapPriceJSON.buyAmount / (10 ** currentTrade.to.decimals);
-        //document.getElementById("gas_estimate").innerHTML = swapPriceJSON.estimatedGas;
+        const swapQuoteJSON = await response.json();
+        console.log(swapQuoteJSON);
 
-       setOutputAmount(swapPriceJSON.buyAmount / (10 ** currentTrade.to.decimals));
+        if(swapQuoteJSON.code == 100) {
+          setLoader(false);
+          setLoader(true);
+          setLoadermsg('Quote for this pair is unavailable');
+          return;
+        }
+
+       setHoldquote(swapQuoteJSON);
+       setOutputAmount(swapQuoteJSON.buyAmount / (10 ** decimalto));
        setLoadermsg('');
        setLoader(false);
        
@@ -325,12 +375,13 @@ export default function Swapform() {
 
       const getTokenslist = async () => {
         console.log("initializing");
-        let response = await fetch('https://tokens.coingecko.com/uniswap/all.json');
+        let response = await fetch('https://api.coingecko.com/api/v3/coins');
         let tokenListJSON = await response.json();
-        console.log("listing available tokens: ");
-        console.log(tokenListJSON.tokens);
-        const tokenstoUse = tokenListJSON.tokens.slice(0, 1000);
-        setSelectedone(eth);
+        //console.log("listing available tokens: ");
+        //console.log(tokenListJSON);
+        //const tokenstoUse = tokenListJSON.tokens.slice(0, 1000);
+        const tokenstoUse = tokenListJSON.slice(1);
+        setSelectedone(tokenstoUse[0]);
         setTokenlist(tokenstoUse);
       }
 
@@ -351,17 +402,31 @@ export default function Swapform() {
 
 
       const getBalance = async (selected, check) => {
-        console.log(selected, check);
-        const ethContract = new ethers.Contract(selected.address, tokenabi, provider);
+        //console.log(selected, check);
 
-        ethContract.balanceOf(signerAddress).then( res => {
-          if(check === 1) {
-            setinBalance( Number(ethers.utils.formatEther(res) ))
-          } else {
-            setoutBalance( Number(ethers.utils.formatEther(res) ))
-          }
+        if(!selected.contract_address) {
+          const provider = new ethers.providers.Web3Provider(window.ethereum);
+          let val =  String(await provider.getBalance(address));
+            if(check === 1) {
+              setinBalance(val)
+            } else {
+              setoutBalance(val)
+            }
 
-        });
+        } else {
+
+          const ethContract = new ethers.Contract(selected.contract_address, tokenabi, provider);
+          ethContract.balanceOf(signerAddress).then( res => {
+            if(check === 1) {
+              setinBalance( Number(ethers.utils.formatEther(res) ))
+            } else {
+              setoutBalance( Number(ethers.utils.formatEther(res) ))
+            }
+  
+          });
+
+        }
+
 
       }
 
@@ -399,7 +464,7 @@ export default function Swapform() {
         }
     
     
-       }, [showModal, toggle])
+       }, [showModal, toggle, loader])
 
 
 
@@ -446,13 +511,13 @@ export default function Swapform() {
                   {selectedone == undefined ?
 
                     <div className="d-flex justify-content-evenly" onClick={() => openOne()} > 
-                      <img class="token_list_img" src={tokenlist[0]?.logoURI} />
+                      <img class="token_list_img" src={tokenlist[0]?.image.thumb} />
                       <small class="token_list_text" style={{fontSize: '13px' }}>{tokenlist[0]?.symbol}</small>
                     </div>
                   :
 
                     <div className="d-flex justify-content-evenly" onClick={() => openOne()} > 
-                      <img class="token_list_img" src={selectedone?.logoURI} />
+                      <img class="token_list_img" src={selectedone?.image.thumb} />
                       <small class="token_list_text" style={{fontSize: '13px' }}>{ selectedone?.symbol }</small>
                     </div>
                   
@@ -465,7 +530,7 @@ export default function Swapform() {
               </div>
               
               <div className="form-group currency-form mb-4">
-                  <input type="text" class="input-control" placeholder="0.0" aria-label="Input" value={outputAmount} />
+                  <input type="text" class="input-control" placeholder="0.0" aria-label="Input" value={ Math.round( (outputAmount) * 10 ) / 10 } />
                   <span className="vr mx-3 my-1"></span>
   
                   <div className='flex flex-column m*-0 px-0 no-gutter' style={{width: '30%'}} >
@@ -477,7 +542,7 @@ export default function Swapform() {
 
                         <>
                         <div className="d-flex justify-content-evenly" onClick={() => openTwo() } > 
-                              <img class="token_list_img" src={selectedtwo?.logoURI} />
+                              <img class="token_list_img" src={selectedtwo?.image.thumb} />
                               <small class="token_list_text" style={{fontSize: '13px' }}>{selectedtwo.symbol}</small>
                         </div>
 
