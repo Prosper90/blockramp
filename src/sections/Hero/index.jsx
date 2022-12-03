@@ -16,6 +16,7 @@ import shape3 from './assets/arrow-shape.svg';
 import shape4 from './assets/hero-user.svg';
 
 import Swapform from './Swapform';
+import Buyform from './Buyform';
 
 
 
@@ -29,8 +30,9 @@ const options = [
 
 
 const rate_options = [
-    { value: 'anpool', label: 'Anpool',},
-    { value: 'anpool2', label: 'Anpool 2',},
+    { value: 'mtpelerin', label: 'Mt Pelerin',},
+    { value: 'Moonpay', label: 'Moon pay',},
+    { value: 'mercuryo', label: 'mercuryo',},
 ];
 
 
@@ -83,6 +85,8 @@ const DropdownIndicator = props => {
 };
 
 const Hero = () => {
+
+
     const data = {
         
         action: [
@@ -91,12 +95,31 @@ const Hero = () => {
         ]
     }
 
+    const [selected, setSelected] = useState(false);
 
 
 
 
-    const form = () => (
-        <div className="heroform card-body p-4 p-lg-5">
+/*
+    const form = () => {
+
+
+        const [test, setTest] = useState([
+            { value: 'mtpelerin', label: 'Mt Pelerin',},
+            { value: 'Moonpay', label: 'Moon pay',},
+            { value: 'mercuryo', label: 'mercuryo',},
+        ])
+        const [selected, setSelected] = useState(false);
+
+
+
+        useEffect(() => {
+
+        })
+
+
+      return (
+         <div className="heroform card-body p-4 p-lg-5">
             <form className='mb-5'>
                 <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
                     <div className='d-flex align-items-center gap-3'>
@@ -125,7 +148,7 @@ const Hero = () => {
                                         fontSize: '15px',
                                     }),
                                 }}
-                                options={rate_options}
+                                options={test}
                                 components={{ IndicatorSeparator:() => null,  DropdownIndicator}}
                             />
                         </div>
@@ -209,9 +232,9 @@ const Hero = () => {
 
             </div>
         </div>
-        
     )
-
+        }
+*/
 
     
   return (
@@ -379,10 +402,23 @@ const Hero = () => {
                                 fill
                                 >
                                 <Tab eventKey="buy" title="BUY">
-                                    {form()}
+
+                                  { selected ?
+
+                                    <iframe 
+                                       style={{maxWidth:640, width:'600px', height:'650px', overflowX:'none', overflowY: 'none' }} 
+                                       src="https://widget.mtpelerin.com/?lang=en" />
+                                   :
+
+                                   <>
+                                     {<Buyform setSelected={setSelected} selected={selected} />}
+                                   </>
+
+                                  } 
+                                  
                                 </Tab>
                                 <Tab eventKey="sell" title="SELL">
-                                    {form()}
+                                  <div>Hi there</div>
                                 </Tab>
                                 <Tab eventKey="swap" title="SWAP">
                                     { <Swapform /> }

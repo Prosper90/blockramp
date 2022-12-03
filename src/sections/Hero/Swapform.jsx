@@ -297,20 +297,28 @@ export default function Swapform() {
         let decimalto = 18;
 
        if(selectedone.contract_address) {
-        console.log("Entered one contract");
-          const fromContract = new ethers.Contract(selectedone.contract_address, tokenabi, provider);
+          console.log("Entered one contract");
+          const signer = await provider.getSigner();
+          const fromContract = new ethers.Contract(selectedone.contract_address, tokenabi, signer);
           decimalfrom = await fromContract.decimals();
           console.log(decimalfrom);
        }
 
        if(selectedtwo.contract_address) {
         console.log("Entered two contract");
-        const toContract = new ethers.Contract(selectedtwo.contract_address, tokenabi, provider);
+        console.log(selectedtwo.contract_address)
+        console.log(provider)
+        const signer = await provider.getSigner();
+        const toContract = await new ethers.Contract(selectedtwo.contract_address, tokenabi, signer);
+        console.log(toContract)
+        console.log("error here two")
+        const name = await toContract.name();
+        console.log(name);
         decimalto = await toContract.decimals();
         console.log(decimalto);
        }
 
-
+        console.log("here error")
         const amountinput = e.target.value;
 
   
@@ -323,6 +331,7 @@ export default function Swapform() {
             buyToken: selectedtwo.contract_address ? selectedtwo.contract_address : selectedtwo.symbol,
             sellToken: selectedone.contract_address ? selectedone.contract_address : selectedone.symbol,
             sellAmount: amount,
+            takerAddress: signerAddress
         }
 
         const getquote = qs.stringify(params);

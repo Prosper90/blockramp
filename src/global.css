@@ -83,3 +83,9 @@
     height: 300px;
     margin-top: 15px;
 }
+
+
+.buttongrey {
+    background: rgba(218,214,234, 27.5) !important;
+    border: none !important
+}
