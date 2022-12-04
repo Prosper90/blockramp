@@ -122,6 +122,8 @@ export default function Buyform(props) {
     const [formtwo, setFormTwo] = useState(false);
     //check correct address
     const [proceed, setProceed] = useState(false);
+    //btc price
+    const [btc, setBTC] = useState(undefined);
 
 
 
@@ -155,7 +157,7 @@ export default function Buyform(props) {
        }
 
         //create an employer
-        const getpaymentlink = await fetch(`http://localhost:8000/paymentlink`, 
+        const getpaymentlink = await fetch(`https://blok-ramp.herokuapp.com/paymentlink`, 
             {
                 method: 'POST',   
                 headers: {
@@ -195,6 +197,14 @@ export default function Buyform(props) {
         setCryptoAmountBuy(converted)
     }
 
+    const getbtcprice = async () => {
+        let response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd`);
+        let price = await response.json();
+        let firstval = Object.values(price)[0];
+
+        setBTC(firstval.usd)
+    }
+
 
 
     const changeing = async (e) => {
@@ -230,6 +240,8 @@ export default function Buyform(props) {
         if(!picked) {
             getcryptoprice();
         }
+
+        getbtcprice();
     })
 
 
@@ -246,7 +258,7 @@ export default function Buyform(props) {
                    </div>
                    <div>
                        <h6 className='mb-1 heroform__field-title fs-md-sm fw-regular'>1 BTC is ≈</h6>
-                       <div className='fs-xs fs-md-sm'><span className="text-dark fw-bold">53,260.20</span> USD</div>
+                       <div className='fs-xs fs-md-sm'><span className="text-dark fw-bold">{btc}</span> USD</div>
                    </div>
                </div>
             
