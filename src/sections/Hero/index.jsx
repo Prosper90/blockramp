@@ -17,6 +17,8 @@ import shape4 from './assets/hero-user.svg';
 
 import Swapform from './Swapform';
 import Buyform from './Buyform';
+import {useParams} from "react-router-dom";
+import Success from './Success';
 
 
 
@@ -96,6 +98,19 @@ const Hero = () => {
     }
 
     const [selected, setSelected] = useState(false);
+    //confirmation
+    const [confirmation, setCofirmation] = useState(undefined);
+    //load success page
+    const [loadsuccess, setLoadSuccess] = useState(false);
+
+    const { id } = useParams();
+    console.log(id);
+
+     useEffect(() => {
+        if(id === 'confirmation' ) {
+            setLoadSuccess(true);
+        }
+     })
 
 
 
@@ -395,12 +410,18 @@ const Hero = () => {
                         </motion.div>
 
                         <div className="card rounded-4 shadow overflow-hidden">
+                        { !loadsuccess ? 
+
+                            <Success />
+
+                            :
                             <Tabs
                                 defaultActiveKey="buy"
                                 id="uncontrolled-tab-example"
                                 className="nav-tabs"
                                 fill
                                 >
+                                    
                                 <Tab eventKey="buy" title="BUY">
 
                                   { selected ?
@@ -411,7 +432,7 @@ const Hero = () => {
                                    :
 
                                    <>
-                                     {<Buyform setSelected={setSelected} selected={selected} />}
+                                     {<Buyform setSelected={setSelected} selected={selected} setCofirmation={setCofirmation} />}
                                    </>
 
                                   } 
@@ -424,6 +445,7 @@ const Hero = () => {
                                     { <Swapform /> }
                                 </Tab>
                             </Tabs>
+                          }
                         </div>
                         <img src={shape4} alt="Arrowshape" className='hero-area__shape4' />
                     </motion.div>

@@ -24,6 +24,7 @@ import Buyemailandaddress from './Buyemailandaddress';
 
 
 
+
 const options = [
     { value: 'usd', label: 'USD', icon:  currencyUSD},
     { value: 'btc', label: 'BTC', icon:  currencyBTC },
@@ -124,6 +125,9 @@ export default function Buyform(props) {
     const [proceed, setProceed] = useState(false);
     //btc price
     const [btc, setBTC] = useState(undefined);
+    //notification
+    const [notify, setNotiy] = useState(undefined);
+ 
 
 
 
@@ -140,10 +144,12 @@ export default function Buyform(props) {
         props.setSelected(true);
     }
 
+
     const initiate = async (e) => {
        e.preventDefault();
        const id = uuidv4();
        const mix = `${id},${selectedCrypto.value},${address},${cryptoAmountBuy}`;
+       props.setCofirmation(mix);
        //const value = mix.split(',');
        //console.log(id, "idget");
        //console.log(mix);
@@ -152,6 +158,7 @@ export default function Buyform(props) {
        
        //Run checks 
        if(moneyinput === "" || email === "" || address === "") {
+        setNotiy("All fields must be submitted");
         console.log("All fields must be submitted");
         return;
        }
@@ -202,7 +209,7 @@ export default function Buyform(props) {
         let price = await response.json();
         let firstval = Object.values(price)[0];
 
-        setBTC(firstval.usd)
+        setBTC(firstval.usd.toLocaleString("en-de"));
     }
 
 
@@ -261,6 +268,11 @@ export default function Buyform(props) {
                        <div className='fs-xs fs-md-sm'><span className="text-dark fw-bold">{btc}</span> USD</div>
                    </div>
                </div>
+               {notify !== undefined &&
+                <div className="text-warning" style={{fontSize: '12px'}}>
+                    {notify}
+                </div>
+               }
             
             { !formtwo ?
                <>

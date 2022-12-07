@@ -12,6 +12,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route exact path="/" element={<Home />} />
+        <Route exact path="/:id" element={<Home />} />
       </Routes>
     </BrowserRouter>
   )
