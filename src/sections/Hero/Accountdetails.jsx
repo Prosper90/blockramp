@@ -26,7 +26,7 @@ export default function Accountdetails(props) {
       </div>
        <div className="form-group currency-form mb-4">
             <input 
-            type="Email" 
+            type="text" 
             class="input-control" 
             placeholder="Bank account" 
             aria-label="Input" 
