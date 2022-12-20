@@ -159,7 +159,7 @@ export default function Buyform(props) {
         //transfer the crypto to us then cal back end to end him money
        e.preventDefault();
        const id = uuidv4();
-       const mix = `${id},${selectedCrypto.value},${address},${cryptoAmountBuy}`;
+       //const mix = `${id},${selectedCrypto.value},${address},${cryptoAmountBuy}`;
        //const value = mix.split(',');
        //console.log(id, "idget");
        //console.log(mix);
