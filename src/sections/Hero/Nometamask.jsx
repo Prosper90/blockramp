@@ -24,6 +24,7 @@ import Buyemailandaddress from './Buyemailandaddress';
 
 
 
+
 const options = [
     { value: 'usd', label: 'USD', icon:  currencyUSD},
     { value: 'btc', label: 'BTC', icon:  currencyBTC },
@@ -127,7 +128,6 @@ export default function Buyform(props) {
     //notification
     const [notify, setNotiy] = useState(undefined);
  
- 
 
 
 
@@ -184,7 +184,6 @@ export default function Buyform(props) {
         window.open(url.response.data.link, 'newwindow', 'width=500,height=600');
 
         if(url.response.status == "success") {
-            props.setLoading(true);
             loop();
         }
 
@@ -204,7 +203,6 @@ export default function Buyform(props) {
           console.log('this will run')
 
             props.setLoadSuccess(true);
-            props.setLoading(false);
           return;
 
         } else {

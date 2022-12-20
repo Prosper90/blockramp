@@ -17,9 +17,10 @@ import shape4 from './assets/hero-user.svg';
 
 import Swapform from './Swapform';
 import Buyform from './Buyform';
+import Sellform from './Sellform';
 import {useParams} from "react-router-dom";
 import Success from './Success';
-
+import PuffLoader from "react-spinners/PuffLoader";
 
 
 const options = [
@@ -99,18 +100,18 @@ const Hero = () => {
 
     const [selected, setSelected] = useState(false);
     //confirmation
-    const [confirmation, setCofirmation] = useState(undefined);
+    const [confirmation, setCofirmation] = useState('sample');
     //load success page
     const [loadsuccess, setLoadSuccess] = useState(false);
+    //loading
+    const [loading, setLoading] = useState(false);
 
-    const { id } = useParams();
-    console.log(id);
+    //const { id } = useParams();
+    //console.log(id);
 
      useEffect(() => {
-        if(id === 'confirmation' ) {
-            setLoadSuccess(true);
-        }
-     })
+
+     }, [])
 
 
 
@@ -409,10 +410,18 @@ const Hero = () => {
                             </svg>
                         </motion.div>
 
-                        <div className="card rounded-4 shadow overflow-hidden">
-                        { !loadsuccess ? 
+                        <div className="card rounded-4 shadow overflow-hidden mainside">
 
-                            <Success />
+                            { loading &&
+                             <div className="loader"> 
+                                <PuffLoader color={"#1554F0"} loading={loading}  size={100} />
+                             </div>
+                            }
+    
+
+                        { loadsuccess ? 
+
+                            <Success setLoadSuccess={setLoadSuccess} />
 
                             :
                             <Tabs
@@ -432,14 +441,24 @@ const Hero = () => {
                                    :
 
                                    <>
-                                     {<Buyform setSelected={setSelected} selected={selected} setCofirmation={setCofirmation} />}
+                                     {<Buyform 
+                                        setSelected={setSelected} 
+                                        selected={selected} 
+                                        setCofirmation={setCofirmation} 
+                                        setLoadSuccess={setLoadSuccess}
+                                        setLoading={setLoading}
+                                        loading={loading}
+                                        /> }
                                    </>
 
                                   } 
                                   
                                 </Tab>
                                 <Tab eventKey="sell" title="SELL">
-                                  <div>Hi there</div>
+                                  <Sellform
+                                    setLoading={setLoading}
+                                    loading={loading}
+                                  />
                                 </Tab>
                                 <Tab eventKey="swap" title="SWAP">
                                     { <Swapform /> }

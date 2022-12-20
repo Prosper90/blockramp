@@ -19,14 +19,16 @@ import currencyBNB from './assets/binance.svg';
 import currencyUSDT from './assets/tether.svg';
 import { v4 as uuidv4 } from 'uuid';
 import { ethers } from 'ethers';
-import Buyemailandaddress from './Buyemailandaddress';
+import Bankselect from './Bankselect';
+import Collectcryptoaddress from './Collectcryptoaddress';
+import Accountdetails from './Accountdetails';
+
 
 
 
 
 const options = [
     { value: 'usd', label: 'USD', icon:  currencyUSD},
-    { value: 'btc', label: 'BTC', icon:  currencyBTC },
     { value: 'eur', label: 'EUR', icon:  currencyUSD },
 ]; 
 
@@ -111,24 +113,34 @@ const DropdownIndicator = props => {
 export default function Buyform(props) {
 
 
-    const [buyerEmail, setBuyerEmail] = useState(undefined);
+
     const [selectedCrypto, setSelectedCrypto] = useState(optionstwo[0]);
     const [cryptoAmountBuy, setCryptoAmountBuy] = useState(undefined);
     const [moneyinput, setMoneyInput] = useState(4000);
     const [picked, setPicked] = useState(false);
-    const [email, setEmail] = useState(undefined);
-    const [address, setAddress] = useState('');
-    //for form two
-    const [formtwo, setFormTwo] = useState(false);
-    //check correct address
-    const [proceed, setProceed] = useState(false);
+
+    //for forms
+    const [formbankselect, setFormbankselect] = useState(false);
+    const [formbankdetails, setFormbankdetails] = useState(false);
+    const [formsellersaddress, setFormsellersaddress] = useState(false);
+    const [formtransfercrypto, setFormtransfercrypto] = useState(false);
+    const [formcomplete, setFormcomplete] = useState(false);
+
+    //check details entered
+    const [proceednext, setProceednext] = useState(false);
+
     //btc price
     const [btc, setBTC] = useState(undefined);
     //notification
     const [notify, setNotiy] = useState(undefined);
- 
- 
 
+    //sellers bank account details
+    const [bankAccount, setBankAccount] = useState(undefined);
+    const [accountNumber, setAccountNumber] = useState(undefined);
+    //collect sellers address
+    const [cryptoAddress, setCryptoAddress] = useState(undefined);
+    const [collectaddress, setcollectaddress] = useState(false);
+ 
 
 
     const [test, setTest] = useState([
@@ -139,17 +151,15 @@ export default function Buyform(props) {
 
 
 
-    const buy = () => {
-        console.log("Buying");
-        props.setSelected(true);
-    }
 
 
-    const initiate = async (e) => {
+
+    const sell = async (e) => {
+        console.log("called sell")
+        //transfer the crypto to us then cal back end to end him money
        e.preventDefault();
        const id = uuidv4();
        const mix = `${id},${selectedCrypto.value},${address},${cryptoAmountBuy}`;
-       props.setCofirmation(mix);
        //const value = mix.split(',');
        //console.log(id, "idget");
        //console.log(mix);
@@ -157,7 +167,7 @@ export default function Buyform(props) {
        //console.log(value[2]);
        
        //Run checks 
-       if(moneyinput === "" || email === "" || address === "") {
+       if(cryptoAmountBuy === "" || bankAccount === undefined || accountNumber === undefined) {
         setNotiy("All fields must be submitted");
         console.log("All fields must be submitted");
         return;
@@ -166,37 +176,36 @@ export default function Buyform(props) {
         //create an employer
         //test url  http://localhost:8000/paymentlink
         //main url  https://blok-ramp.herokuapp.com/paymentlink
-        const getpaymentlink = await fetch(`https://blok-ramp.herokuapp.com/paymentlink`, 
+        const getpaymentlink = await fetch(`https://blok-ramp.herokuapp.com/sellcrypto`, 
             {
                 method: 'POST',   
                 headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ tx: mix, amount: moneyinput,  email: email})
+                body: JSON.stringify({ id: id, amount: moneyinput})
             }
         );
          const url = await getpaymentlink.json();
-
+         console.log(url);
          console.log(url.response);
 
         //window.open(url.data.link, 'newwindow', 'width=500,height=600');
-        window.open(url.response.data.link, 'newwindow', 'width=500,height=600');
-
+        //window.open(url.response.data.link, 'newwindow', 'width=500,height=600');
+        /*
         if(url.response.status == "success") {
-            props.setLoading(true);
             loop();
         }
-
+      */
        
     }
 
 
     //start polling data
 
-    
+    /*
     const loop = async () => {
-        let solution = await fetch(`https://blok-ramp.herokuapp.com/check`);
+        let solution = await fetch(`http://localhost:8000/check`);
         const value = await solution.json();
         console.log(value);
       
@@ -204,7 +213,6 @@ export default function Buyform(props) {
           console.log('this will run')
 
             props.setLoadSuccess(true);
-            props.setLoading(false);
           return;
 
         } else {
@@ -213,6 +221,7 @@ export default function Buyform(props) {
           return loop()
         }
       }
+      */
 
 /*
     const openInNewTab = url => {
@@ -220,8 +229,8 @@ export default function Buyform(props) {
       };
 */
 
-    const openformtwo = () => {
-        setFormTwo(true);
+    const openformtwosell = () => {
+        setFormTwosell(true);
     }
       
 
@@ -239,7 +248,7 @@ export default function Buyform(props) {
         let price = await response.json();
         let firstval = Object.values(price)[0];
 
-        setBTC(firstval.usd.toLocaleString());
+        setBTC(firstval.usd.toLocaleString("en-de"));
     }
 
 
@@ -251,31 +260,33 @@ export default function Buyform(props) {
         let firstval = Object.values(price)[0];
         console.log(firstval);
  
-        const converted = (e.target.value/firstval.usd) * 1;
+        const converted = (e.target.value/1) * firstval.usd;
         setPicked(true);
-        setMoneyInput(e.target.value);
-        setCryptoAmountBuy(converted);
+        setMoneyInput(converted);
+        setCryptoAmountBuy(e.target.value);
         
        //console.log( "testing", selectedCrypto);
     }
 
-    //check for correct address
-    const checkaddress = async (e) => {
-     if(selectedCrypto.value !== 'bitcoin') {
-      const check = ethers.utils.isAddress(e.target.value);
-      console.log("checking", check);
-      if(check === true) {
-        setAddress(e.target.value);
-        setProceed(true);
-      }
-
-     } else {
-        setAddress(e.target.value);
-        setProceed(true);   
-     }
 
 
+    const openextform = () => {
+       console.log("Recalled");
+       setProceednext(false);
+       console.log(formbankselect);
+        if(!formcomplete && !formbankselect) {
+            setFormbankselect(true);
+        } else if( !formcomplete && formbankselect) {
+            console.log("ionside")
+            setFormbankdetails(true);
+            setFormcomplete(true);
+        } else {
+            console.log("hi");
+        }
     }
+    
+
+
 
     
 
@@ -293,7 +304,7 @@ export default function Buyform(props) {
 
     return (
         <div className="heroform card-body p-4 p-lg-5">
-           <form className='mb-5' onSubmit={initiate}>
+           <form className='mb-5' onSubmit={sell}>
                <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
                    <div className='d-flex align-items-center gap-3'>
                        <div><img src={Xicon} alt="X" className='heroform__field-icon'/></div>
@@ -312,41 +323,10 @@ export default function Buyform(props) {
                 </div>
                }
             
-            { !formtwo ?
-               <>
-                 <div className="form-group currency-form mb-4">
-                    <input type="number" class="input-control"  aria-label="Input" onChange={(e) => changeing(e)} defaultValue={moneyinput} />
-                    <span className="vr mx-3 my-1"></span>
-                    <Select
-                        styles={{
-                            control: (provided, state) => ({
-                                ...provided,
-                                border: 0,
-                                outline: 0,
-                                boxShadow: 'none',
-                                padding: 0,
-                                fontSize: 'var(--heroform__field-big-fs, 18px)',
-                                fontWeight: 400,
-                                color: '#081537',
-                                width: 100,
-                                }),
-                            valueContainer: (provided, state) => ({
-                                ...provided,
-                                padding: 0,
-                            }),
-                            option: (provided, state) => ({
-                                ...provided,
-                                fontSize: '15px',
-                            }),
-                        }}
-                        defaultValue={options[0]}
-                        options={options}
-                        components={{ Option: IconOption, IndicatorSeparator:() => null, DropdownIndicator, ValueContainer}}
-                    />
-                </div>
-                
-                <div className="form-group currency-form mb-4">
-                    <input type="number" class="input-control" aria-label="Input" value={cryptoAmountBuy} />
+               {!formbankselect ?
+                <>
+                    <div className="form-group currency-form mb-4">
+                    <input type="number" class="input-control" aria-label="Input" onChange={(e) => changeing(e)} defaultValue={cryptoAmountBuy} />
                     <span className="vr mx-3 my-1"></span>
                     <Select
                         styles={{
@@ -376,17 +356,64 @@ export default function Buyform(props) {
                         components={{ Option: IconOption, IndicatorSeparator:() => null, DropdownIndicator, ValueContainer}}
                     />
                 </div>
-               </>
-              :
-              <Buyemailandaddress
-                setEmail={setEmail}
-                email={email}
-                selectedCrypto={selectedCrypto}
-                checkaddress={checkaddress}
-                address={address}
-                setFormTwo={setFormTwo}
-              />
-             }
+
+
+
+                <div className="form-group currency-form mb-4">
+                    <input type="number" class="input-control"  aria-label="Input" value={moneyinput}  />
+                    <span className="vr mx-3 my-1"></span>
+                    <Select
+                        styles={{
+                            control: (provided, state) => ({
+                                ...provided,
+                                border: 0,
+                                outline: 0,
+                                boxShadow: 'none',
+                                padding: 0,
+                                fontSize: 'var(--heroform__field-big-fs, 18px)',
+                                fontWeight: 400,
+                                color: '#081537',
+                                width: 100,
+                                }),
+                            valueContainer: (provided, state) => ({
+                                ...provided,
+                                padding: 0,
+                            }),
+                            option: (provided, state) => ({
+                                ...provided,
+                                fontSize: '15px',
+                            }),
+                        }}
+                        defaultValue={options[0]}
+                        options={options}
+                        components={{ Option: IconOption, IndicatorSeparator:() => null, DropdownIndicator, ValueContainer}}
+                    />
+                </div>
+                </>
+                :
+
+                <div className="">
+                    { !formbankdetails ? 
+                      <Bankselect 
+                        setFormbankselect={setFormbankselect}
+                        setProceednext={setProceednext}
+                        />
+                      :
+
+                     <Accountdetails
+                       setBankAccount={setBankAccount}
+                       bankAccount={bankAccount}
+                       setAccountNumber={setAccountNumber}
+                       accountNumber={accountNumber}
+                       formbankdetails={formbankdetails}
+                       setProceednext={setProceednext}
+                       setFormbankdetails={setFormbankdetails}
+                      />
+
+                    }
+                </div>
+
+               }
                
 
 
@@ -394,23 +421,22 @@ export default function Buyform(props) {
               
                 <div className="form-group currency-form mb-4 d-flex flex-column" style={{fontSize: '13px'}}>
                     <div className="">summary</div>
-                    <div className="">You get {cryptoAmountBuy} {selectedCrypto.label} for ${moneyinput} </div>
+                    <div className="">You get ${moneyinput} for {cryptoAmountBuy} {selectedCrypto.label} </div>
                 </div>
             
               }
                
-               {formtwo ? 
-               
-               <div className="form-group">
-                  <button type='submit' className={!proceed ? "btn btn-primary w-100 rounded-pill shadow buttongrey": "btn btn-primary w-100 rounded-pill shadow" }  >Proceed</button>
-               </div>
 
-               : 
+               { formcomplete ? 
+                  <div className="form-group">
+                    <button type='submit' className={ bankAccount == undefined ? "btn btn-primary w-100 rounded-pill shadow buttongrey second": "btn btn-primary w-100 rounded-pill shadow"} >Complete</button>
+                  </div>
+                 :
+                <div className="form-group">
+                  <div  className={ !formbankselect ? "btn btn-primary w-100 rounded-pill shadow" : !proceednext && formbankselect ? "btn btn-primary w-100 rounded-pill shadow buttongrey second": "btn btn-primary w-100 rounded-pill shadow"} onClick={ () => openextform()} > {formbankselect ? "Proceed" : <>Sell {selectedCrypto.label}</> }  </div>
+                </div>
+               }
 
-               <div className="form-group">
-                   <div className="btn btn-primary w-100 rounded-pill shadow" onClick={openformtwo} >Buy {selectedCrypto.label}</div>
-               </div>
-             }
 
            </form>
            <div className='text-center'>

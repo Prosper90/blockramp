@@ -23,7 +23,7 @@ import Configmodal from './Configmodal';
 import Tokensmodal from './Tokensmodal';
 import tokenabi from './abi.json';
 import qs from 'qs';
-import { ChainId, Fetcher, Percent, Token, TokenAmount, Pair, TradeType, Route, CurrencyAmount, WETH } from '@uniswap/sdk'
+
 
 
 
@@ -80,7 +80,8 @@ export default function Swapform() {
 
         //hold quote
         const [holdquote, setHoldquote] =useState();
-
+        //chain
+        const [chain, setChain] = useState(undefined);
 
 
         
@@ -96,11 +97,60 @@ export default function Swapform() {
       }
 
 
+        
+        //function to get quote
+        const getSellQuote = async (amounttosell) => {
+          
+          let decimalfrom = 18;
+          let decimalto = 18;
+  
+         if(selectedone.contract_address) {
+            console.log("Entered one contract");
+            const signer = await provider.getSigner();
+            const fromContract = new ethers.Contract(selectedone.contract_address, tokenabi, signer);
+            decimalfrom = await fromContract.decimals();
+            console.log(decimalfrom);
+         }
+  
+         if(selectedtwo.contract_address) {
+          console.log("Entered two contract");
+          console.log(selectedtwo.contract_address)
+          console.log(provider)
+          const signer = await provider.getSigner();
+          const toContract = await new ethers.Contract(selectedtwo.contract_address, tokenabi, signer);
+          console.log(toContract)
+          console.log("error here two")
+          const name = await toContract.name();
+          console.log(name);
+          decimalto = await toContract.decimals();
+          console.log(decimalto);
+         }
+  
+         
+  
+          const amount = Number(parseInt(amounttosell) * 10 ** decimalfrom);
+          //const amount = ethers.utils.parseEther(e.target.value);
+        
+          const params = {
+              buyToken: selectedtwo.contract_address ? selectedtwo.contract_address : selectedtwo.symbol,
+              sellToken: selectedone.contract_address ? selectedone.contract_address : selectedone.symbol,
+              sellAmount: amount,
+              takerAddress: signerAddress
+          }
+  
+          const getquote = qs.stringify(params);
+          console.log(getquote);
+        
+          // Fetch the swap price.
+          const response = await fetch(`https://api.0x.org/swap/v1/quote?${qs.stringify(params)}`);
+  
+          
+          const swapQuoteJSON = await response.json();
+          return swapQuoteJSON
+        }
 
-
-        //swap function
  
-
+        //swap function
         const submit = async (e) => {
 
               if(!signerAddress) {
@@ -152,6 +202,7 @@ export default function Swapform() {
                   
                 }, 2000);
               };
+              const amountquote = e.target.inputname.value;
 
               console.log("trying swap");
               // Only work if MetaMask is connect
@@ -163,7 +214,7 @@ export default function Swapform() {
               let takerAddress = signerAddress;
               console.log("takerAddress: ", takerAddress);
             
-              const swapQuoteJSON = holdquote;
+              const swapQuoteJSON = await getSellQuote(amountquote);
             
               // Set Token Allowance
               // Set up approval amount
@@ -196,24 +247,11 @@ export default function Swapform() {
         const isConnected = () => signer !== undefined;
     
         //getWallet address
-        const getWalletAddress = () => {
+        const getWalletAddress = async () => {
             signer.getAddress().
             then(address => {
-              setSignerAddress(address)
-
-    
-              //todo: connect weth and uni contracts
-            /*
-              ethContract.balanceOf(address).then( res => {
-                setEthAmount( Number(ethers.utils.formatEther(res) ))
-              });
-    
-              uniContract.balanceOf(address).then( res => {
-                setUniAmount( Number(ethers.utils.formatEther(res) ))
-              })
-            */
-    
-            })
+              setSignerAddress(address);
+            });
         }
     
     
@@ -226,7 +264,7 @@ export default function Swapform() {
         //getSigner
         const getSigner = async ( provider ) => {
             console.log("Second guy");
-          provider?.send("eth_requestAccounts", []);
+          await provider?.send("eth_requestAccounts", []);
           const signer =  provider.getSigner();
           setSigner(signer);
           return;
@@ -330,8 +368,7 @@ export default function Swapform() {
         const params = {
             buyToken: selectedtwo.contract_address ? selectedtwo.contract_address : selectedtwo.symbol,
             sellToken: selectedone.contract_address ? selectedone.contract_address : selectedone.symbol,
-            sellAmount: amount,
-            takerAddress: signerAddress
+            sellAmount: amount
         }
 
         const getquote = qs.stringify(params);
@@ -355,7 +392,7 @@ export default function Swapform() {
           return;
         }
 
-       setHoldquote(swapQuoteJSON);
+       //setHoldquote(swapQuoteJSON);
        setOutputAmount(swapQuoteJSON.buyAmount / (10 ** decimalto));
        setLoadermsg('');
        setLoader(false);
@@ -363,23 +400,6 @@ export default function Swapform() {
       }
 
 
-
-      const getContracts = async (addr) => {
-
-        const createuserbuyer = await fetch(`http://localhost:8000/contracts`, 
-          {
-              method: 'POST',   
-              headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({ enteredaddr: addr})
-          }
-        );
-        await createuserbuyer.json();
-
-
-      }
 
 
       const getTokenslist = async () => {
@@ -397,14 +417,18 @@ export default function Swapform() {
 
       //pickSelected
       const openOne = () => {
-        setCheckselect(1);
-        setOpenlistmodal(true);
+        if(chain == 1) {
+          setCheckselect(1);
+          setOpenlistmodal(true);
+        }
       }
 
 
       const openTwo = () => {
-        setCheckselect(2);
-        setOpenlistmodal(true);
+        if(chain == 1) {
+          setCheckselect(2);
+          setOpenlistmodal(true);
+        }
       }
 
 
@@ -440,40 +464,55 @@ export default function Swapform() {
       }
 
 
+      const onLoad = async () => {
+        const provider = await new ethers.providers.Web3Provider(window.ethereum);
+        setProvider(provider);
+        const signer = await provider.getSigner();
+        setChain(await signer.getChainId());
+    }
+
     
        //useEffect
        useEffect(() => {
         console.log("Entered");
-         const onLoad = async () => {
-            const provider = await new ethers.providers.Web3Provider(window.ethereum);
-            setProvider(provider);
-            console.log("ran through");
-          
-          
-            const ethContract = getfirstContract(selectedone.address);
-            setOneContract(ethContract);
-    
-    
-            const uniContract = getsecondContract(selectedtwo.address);
-            setTwoContract(uniContract);
-          
-
-        }
     
         onLoad();
         console.log(showModal);
 
         getTokenslist();
 
-
+/*
         if(loader) {
            setToggle(!toggle);
         } else {
           setToggle(false);
         }
+*/
     
-    
-       }, [showModal, toggle, loader])
+       }, [showModal, toggle, loader, chain])
+
+
+    //on Chain changed
+     if(window.ethereum) {
+        window.ethereum.on('chainChanged', async function (chainId) {
+          //account = accounts[0];
+          console.log("called chain changed");
+          onLoad();
+          getSigner(provider);
+          setChain(await signer.getChainId());
+          console.log("Called again");
+      });
+   }
+
+     //on account changed
+      if(window.ethereum){
+
+        window.ethereum.on('accountsChanged', function (accounts) {
+          // Time to reload your interface with accounts[0]!
+          getWalletAddress();
+        });
+
+      }
 
 
 
@@ -482,14 +521,11 @@ export default function Swapform() {
         <div className="heroform card-body p-4 p-lg-5 formswap" >
           <form className='mb-5' onSubmit={submit} >
               <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
-                  <div className='d-flex align-items-center gap-3' style={{fontSize: '20px'}}>
-                       How much do you want to swap ?
-                  </div>
+                
                   <div className='d-flex w-100 justify-content-between pr-3'>
-                      <div className='d-flex w-100'>
-                          <h6 className='mb-1 heroform__field-title fs-md-sm fw-regular'>1 BTC is ≈</h6>
-                          <div className='fs-xs fs-md-sm ml-3'><span className="text-dark fw-bold">53,260.20</span> USD</div>
-                      </div>
+                    <div className=""  style={{fontSize: '17px'}}>
+                       How much do you want to swap ?
+                       </div>
   
                       <div className='text-end' onClick={() => setShowModal(true) }>
                         <BsGearFill />
@@ -512,7 +548,10 @@ export default function Swapform() {
   
               </div>
               
-              <div className="form-group currency-form mb-4" >
+              <div className="form-group currency-form mb-4 d-flex flex-column" >
+                <small style={{fontSize: '10px'}}>You Spend</small>
+
+                <div className='d-flex'>
                   <input type="text" class="input-control" name="inputname" placeholder="0.0" aria-label="Input" onChange={(e) => handleChangerecieved(e)}  />
                   <span className="vr mx-3 my-1"></span>
                   <div className='flex flex-column m*-0 px-0 no-gutter' style={{width: '30%'}} >
@@ -536,16 +575,20 @@ export default function Swapform() {
 
                   <div className='balanceshow' >Balance : {inBalalnce} </div>
                   </div>
+                  </div>
               </div>
               
-              <div className="form-group currency-form mb-4">
+              <div className="form-group currency-form mb-4 d-flex flex-column">
+                 <small style={{fontSize: '10px'}}>You Recieve</small>
+                 
+                 <div className="d-flex">
                   <input type="text" class="input-control" placeholder="0.0" aria-label="Input" value={ Math.round( (outputAmount) * 10 ) / 10 } />
                   <span className="vr mx-3 my-1"></span>
   
                   <div className='flex flex-column m*-0 px-0 no-gutter' style={{width: '30%'}} >
                     { selectedtwo == undefined ?
 
-                        <small onClick={() => openTwo() } >Select</small>
+                        <small onClick={() => openTwo() } style={{fontSize: '13px'}} >Select</small>
                       
                         :
 
@@ -559,6 +602,8 @@ export default function Swapform() {
                         </>
                      }
 
+
+               </div>
 
                </div>
   
@@ -581,14 +626,23 @@ export default function Swapform() {
                 <>
   
                   <div className="form-group">
-                    <>
-                      {inBalalnce == 0 ?
-                        <div className="btn btn-primary w-100 rounded-pill shadow text-warning" type='button'> Insufficient {selectedone.symbol} amount </div>
-                       :
-                        <button className="btn btn-primary w-100 rounded-pill shadow" type='button'>Swap</button>
-                      }
-                      
-                    </>
+                    {chain !== 1 ?
+
+                        <>
+                          <div className="btn btn-primary w-100 rounded-pill shadow text-warning buttongrey" type='button' style={{fontSize: '13px'}}> Wrong Chain! Connect to ETH </div>
+                        </>
+
+                        :
+
+                        <>
+                        {inBalalnce == 0 ?
+                          <div className="btn btn-primary w-100 rounded-pill shadow text-warning" type='button'> Insufficient {selectedone.symbol} amount </div>
+                        :
+                          <button className="btn btn-primary w-100 rounded-pill shadow" type='button'>Swap</button>
+                        }
+                        </>
+                    
+                    }
                   </div>
 
                   <small style={{fontSize: '12px'}}>{signerAddress && <> {displayaddr()}... </>}</small>

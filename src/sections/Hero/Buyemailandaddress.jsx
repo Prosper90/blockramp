@@ -1,8 +1,21 @@
 import React from 'react';
+import { BiArrowBack } from 'react-icons/bi';
+
 
 export default function Buyemailandaddress(props) {
+
+
+  const goback = () => {
+    props.setFormTwo(false)
+    navigate(`/`);
+  }
+
+
   return (
     <div>
+        <div className="" style={{ padding: '5px' }}>
+          <BiArrowBack onClick={goback} />
+      </div>
        <div className="form-group currency-form mb-4">
             <input 
             type="Email" 
