@@ -105,9 +105,11 @@ const Hero = () => {
     const [loadsuccess, setLoadSuccess] = useState(false);
     //loading
     const [loading, setLoading] = useState(false);
+    
+    //for selling
+    const [callframe, setCallframe] = useState(false)
+    const [frameurl, setFrameurl] = useState("");
 
-    //const { id } = useParams();
-    //console.log(id);
 
      useEffect(() => {
 
@@ -424,6 +426,13 @@ const Hero = () => {
                             <Success setLoadSuccess={setLoadSuccess} />
 
                             :
+                           
+                           <>
+                            { callframe ?
+
+                             <iframe src={`${frameurl}/embed`} frameborder="0" style={{ position: 'relative', maxWidth:640, width:'100%', height:'100%', overflowX:'none', overflowY: 'none' }} />
+                            :
+
                             <Tabs
                                 defaultActiveKey="buy"
                                 id="uncontrolled-tab-example"
@@ -458,13 +467,19 @@ const Hero = () => {
                                   <Sellform
                                     setLoading={setLoading}
                                     loading={loading}
+                                    setFrameurl={setFrameurl}
+                                    setCallframe={setCallframe}
                                   />
                                 </Tab>
                                 <Tab eventKey="swap" title="SWAP">
                                     { <Swapform /> }
                                 </Tab>
                             </Tabs>
+                        
+                            }
+                           </>
                           }
+
                         </div>
                         <img src={shape4} alt="Arrowshape" className='hero-area__shape4' />
                     </motion.div>

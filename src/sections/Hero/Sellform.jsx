@@ -20,8 +20,11 @@ import currencyUSDT from './assets/tether.svg';
 import { v4 as uuidv4 } from 'uuid';
 import { ethers } from 'ethers';
 import Bankselect from './Bankselect';
+import Banksmodal from './Banksmodal';
 import Collectcryptoaddress from './Collectcryptoaddress';
 import Accountdetails from './Accountdetails';
+import Accountdetailsus from './Accountdetailsus';
+import Accountdetailsuk from './Accountdetailsuk';
 
 
 
@@ -110,7 +113,7 @@ const DropdownIndicator = props => {
 
 
 
-export default function Buyform(props) {
+export default function Sellform(props) {
 
 
 
@@ -118,6 +121,9 @@ export default function Buyform(props) {
     const [cryptoAmountBuy, setCryptoAmountBuy] = useState(undefined);
     const [moneyinput, setMoneyInput] = useState(4000);
     const [picked, setPicked] = useState(false);
+
+    //clients country
+    const [country, setCountry] = useState(undefined);
 
     //for forms
     const [formbankselect, setFormbankselect] = useState(false);
@@ -135,12 +141,25 @@ export default function Buyform(props) {
     const [notify, setNotiy] = useState(undefined);
 
     //sellers bank account details
-    const [bankAccount, setBankAccount] = useState(undefined);
-    const [accountNumber, setAccountNumber] = useState(undefined);
-    //collect sellers address
-    const [cryptoAddress, setCryptoAddress] = useState(undefined);
-    const [collectaddress, setcollectaddress] = useState(false);
- 
+    const [bankAccount, setBankAccount] = useState('');
+    const [accountNumber, setAccountNumber] = useState('');
+    //list of banks
+    const [banklist, setBankList] = useState(undefined);
+    //bank modal
+    const [modalbank, setModalBank] = useState(false);
+
+    //us and uk values
+    const [routingNumber, setRoutingNumber] = useState(undefined);
+    const [swiftCode, setSwiftCode] = useState(undefined);
+    const [beneficiaryName, setBeneficiaryName] = useState(undefined);
+    const [beneficiaryCountry, setBeneficiaryCountry] = useState(undefined);
+    const [postalCode, setPostalCode] = useState(undefined);
+    const [streetNumber, setStreetNumber] = useState(undefined);
+    const [StreetName, setStreetName] = useState(undefined);
+    const [city, setCity] = useState(undefined);
+
+    //confirm account number
+    const [confirmcAccount, setConfirmAccount] = useState(false);
 
 
     const [test, setTest] = useState([
@@ -188,31 +207,32 @@ export default function Buyform(props) {
         );
          const url = await getpaymentlink.json();
          console.log(url);
-         console.log(url.response);
-
-        //window.open(url.data.link, 'newwindow', 'width=500,height=600');
+         //console.log(url.response);
+         
+         //props.setFrameurl(url.payment_url);
+         //props.setCallframe(true);
+         window.open(url.payment_url, 'rating', 'width=500,height=600');
         //window.open(url.response.data.link, 'newwindow', 'width=500,height=600');
-        /*
-        if(url.response.status == "success") {
-            loop();
-        }
-      */
+        
+        props.setLoading(true);
+        loop(); 
        
     }
 
 
     //start polling data
 
-    /*
     const loop = async () => {
-        let solution = await fetch(`http://localhost:8000/check`);
+        let solution = await fetch(`https://blok-ramp.herokuapp.com/checkpaid`);
         const value = await solution.json();
         console.log(value);
       
         if (value.check === true) {
-          console.log('this will run')
+           console.log('this will run')
 
-            props.setLoadSuccess(true);
+           console.log("call server to call fluter wave and transfer money");
+           props.setLoading(false);
+           //then call transfer money
           return;
 
         } else {
@@ -221,7 +241,7 @@ export default function Buyform(props) {
           return loop()
         }
       }
-      */
+
 
 /*
     const openInNewTab = url => {
@@ -286,7 +306,26 @@ export default function Buyform(props) {
     }
     
 
+ 
+   //test http://localhost:8000/getbanks
+   //live https://blok-ramp.herokuapp.com/getbanks
+   const getListOfBanks = async (data) => {
+    console.log(data, "country data");
+    let response = await fetch(`https://blok-ramp.herokuapp.com/getbanks/${data}`);
+    let banks = await response.json();
+    //console.log(banks);
+    setBankList(banks.data);
+   }
 
+
+   const getClientip = async () => {
+    let response = await fetch(`https://ipapi.co/json/`);
+    let country = await response.json();
+    console.log(country);
+    setCountry(country.country);
+
+    getListOfBanks(country.country);
+   }
 
     
 
@@ -298,13 +337,19 @@ export default function Buyform(props) {
         }
 
         getbtcprice();
-    })
+        getClientip();
+        if(country !== undefined) {
+            //console.log("bank called");
+
+        }
+
+    }, [])
 
 
 
     return (
         <div className="heroform card-body p-4 p-lg-5">
-           <form className='mb-5' onSubmit={sell}>
+           <form className='mb-5' >
                <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
                    <div className='d-flex align-items-center gap-3'>
                        <div><img src={Xicon} alt="X" className='heroform__field-icon'/></div>
@@ -400,15 +445,61 @@ export default function Buyform(props) {
                         />
                       :
 
-                     <Accountdetails
-                       setBankAccount={setBankAccount}
-                       bankAccount={bankAccount}
-                       setAccountNumber={setAccountNumber}
-                       accountNumber={accountNumber}
-                       formbankdetails={formbankdetails}
-                       setProceednext={setProceednext}
-                       setFormbankdetails={setFormbankdetails}
-                      />
+                      <>
+                     
+                      { country == 'NG' || country == 'GH' || country == 'KE' || country == 'UG' || country == 'ZA' || country == 'TZ' ?
+
+                        <Accountdetails
+                        setBankAccount={setBankAccount}
+                        bankAccount={bankAccount}
+                        setAccountNumber={setAccountNumber}
+                        accountNumber={accountNumber}
+                        formbankdetails={formbankdetails}
+                        setProceednext={setProceednext}
+                        setFormbankdetails={setFormbankdetails}
+                        banklist={banklist}
+                        setConfirmAccount={setConfirmAccount}
+                        setNotiy={setNotiy}
+                        />
+
+                        : country == "US" ?
+
+                        <Accountdetailsus
+                        setBankAccount={setBankAccount}
+                        bankAccount={bankAccount}
+                        setAccountNumber={setAccountNumber}
+                        accountNumber={accountNumber}
+                        setProceednext={setProceednext}
+                        setFormbankdetails={setFormbankdetails}
+                        setRoutingNumber={setRoutingNumber}
+                        setSwiftCode={setSwiftCode}
+                        setBeneficiaryName={setBeneficiaryName}
+                        setBeneficiaryCountry={setBeneficiaryCountry}
+                        />
+
+                        : country == "ENG" || country == "UK" &&
+
+
+                        <Accountdetailsuk
+                        setBankAccount={setBankAccount}
+                        bankAccount={bankAccount}
+                        setAccountNumber={setAccountNumber}
+                        accountNumber={accountNumber}
+                        setProceednext={setProceednext}
+                        setFormbankdetails={setFormbankdetails}
+                        setRoutingNumber={setRoutingNumber}
+                        setSwiftCode={setSwiftCode}
+                        setBeneficiaryName={setBeneficiaryName}
+                        setBeneficiaryCountry={setBeneficiaryCountry}
+                        setPostalCode={setPostalCode}
+                        setStreetNumber={setStreetNumber}
+                        setStreetName={setStreetName}
+                        setCity={setCity}
+                        />
+
+                      }
+
+                    </>
 
                     }
                 </div>
@@ -429,7 +520,7 @@ export default function Buyform(props) {
 
                { formcomplete ? 
                   <div className="form-group">
-                    <button type='submit' className={ bankAccount == undefined ? "btn btn-primary w-100 rounded-pill shadow buttongrey second": "btn btn-primary w-100 rounded-pill shadow"} >Complete</button>
+                    <button  className={ !confirmcAccount ? "btn btn-primary w-100 rounded-pill shadow buttongrey second": "btn btn-primary w-100 rounded-pill shadow"} onClick={sell} >Complete</button>
                   </div>
                  :
                 <div className="form-group">

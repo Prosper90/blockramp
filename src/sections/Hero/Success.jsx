@@ -8,7 +8,6 @@ export default function Success(props) {
 
   const goback = () => {
     props.setLoadSuccess(false)
-    navigate(`/`);
   }
 
 
