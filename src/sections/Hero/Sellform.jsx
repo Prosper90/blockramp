@@ -173,7 +173,7 @@ export default function Sellform(props) {
 
 
 
-    const sell = async (e) => {
+    const sell = async () => {
         console.log("called sell")
         //transfer the crypto to us then cal back end to end him money
        e.preventDefault();
@@ -322,9 +322,12 @@ export default function Sellform(props) {
     let response = await fetch(`https://ipapi.co/json/`);
     let country = await response.json();
     console.log(country);
-    setCountry(country.country);
+    setCountry(country);
 
-    getListOfBanks(country.country);
+    if(country.country == 'NG' || country.country == 'GH' || country.country == 'KE' || country.country == 'UG' || country.country == 'ZA' || country.country == 'TZ' ) {
+        getListOfBanks(country.country);
+    }
+
    }
 
     
@@ -447,7 +450,7 @@ export default function Sellform(props) {
 
                       <>
                      
-                      { country == 'NG' || country == 'GH' || country == 'KE' || country == 'UG' || country == 'ZA' || country == 'TZ' ?
+                      { country.country == 'NG' || country.country == 'GH' || country.country == 'KE' || country.country == 'UG' || country.country == 'ZA' || country.country == 'TZ' ?
 
                         <Accountdetails
                         setBankAccount={setBankAccount}
@@ -462,7 +465,7 @@ export default function Sellform(props) {
                         setNotiy={setNotiy}
                         />
 
-                        : country == "US" ?
+                        : country.currency == "USD" ?
 
                         <Accountdetailsus
                         setBankAccount={setBankAccount}
@@ -477,7 +480,7 @@ export default function Sellform(props) {
                         setBeneficiaryCountry={setBeneficiaryCountry}
                         />
 
-                        : country == "ENG" || country == "UK" &&
+                        : country.currency == "EUR" || country.currency == "GBP" ?
 
 
                         <Accountdetailsuk
@@ -496,6 +499,11 @@ export default function Sellform(props) {
                         setStreetName={setStreetName}
                         setCity={setCity}
                         />
+
+
+                        :
+
+                        <div className="">Ip not supported</div>
 
                       }
 

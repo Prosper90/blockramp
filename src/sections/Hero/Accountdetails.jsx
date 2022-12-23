@@ -19,7 +19,7 @@ import { BiArrowBack } from 'react-icons/bi';
     
    if(e.target.value.length === 10) {
 
-        const getpaymentlink = await fetch(`https://blok-ramp.herokuapp.com/getbanks/confirmaccount`, 
+        const getpaymentlink = await fetch(`https://blok-ramp.herokuapp.com/confirmaccount`, 
         {
             method: 'POST',   
             headers: {
@@ -32,11 +32,11 @@ import { BiArrowBack } from 'react-icons/bi';
         const url = await getpaymentlink.json();
         console.log(url);
 
-        if(url === 'status') {
+        if(url.status === 'success') {
           props.setConfirmAccount(true);
         } else{
           console.log("this guy called")
-          props.setNotiy("This account number is not correct")
+          props.setNotiy("This account number is invalid")
         }
 
    }
